@@ -1,0 +1,34 @@
+version: '2'  
+services:  
+  web:
+    restart: always
+    image: ghost:latest
+    ports:
+      - "2368:2368"
+    environment:
+      - url=http://example.com
+      - database__client=mysql
+      - database__connection__host=db
+      - database__connection__user=ghostdb
+      - database__connection__password=secret
+      - database__connection__database=ghostdb
+    networks:
+      - ghost
+    depends_on:
+      - db
+    restart: unless-stopped
+  db:
+    image: mariadb
+    volumes:
+      - /opt/ghost/ghostdb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=supersecret
+      - MYSQL_DATABASE=ghostdb
+      - MYSQL_USER=ghostdb
+      - MYSQL_PASSWORD=secret
+    networks:
+      - ghost
+    restart: unless-stopped
+networks:
+   ghost:
+     driver: bridge
